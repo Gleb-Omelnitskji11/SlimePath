@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using Core.ServiceLocator;
 using UnityEngine;
@@ -22,22 +21,21 @@ namespace Gameplay
         [Range(0, 1)] public float clusterChance = 0.4f;
 
         [Header("Side Obstacles")]
-        public float sideMinX = 3.2f;
-        public float sideMaxX = 9f;
+        public float sideMinX = 2.2f;
+        public float sideMaxX = 4f;
         [Range(0, 1)] public float sideDensity = 0.7f;
 
         [Header("Validation")]
         public int maxAttempts = 50;
-        public float playerWasteFactor = 1.25f; // Extra allowance for player input imprecision.
+        public float playerWasteFactor = 1.2f; // Extra allowance for player input imprecision.
 
         public List<ObstacleData> Data { get; private set; }
         public bool[] Dead { get; private set; }
         public float GoalZ => goalZ;
+        public GateController Gate { get; private set; }
 
         private Obstacle[] _objs;
         private Transform _road;
-        private Transform _leftDoor, _rightDoor;
-        private bool _doorOpened;
 
         public void Build()
         {
@@ -190,26 +188,7 @@ namespace Gameplay
             SetRoad(startRadius * 2f);
 
             // Double gate with leaves hinged at the outer edges.
-            float gateWidth = startRadius * 4f + 1f;
-            float leafWidth = gateWidth * 0.5f;
-            _leftDoor = CreateGateLeaf("Left Gate", -leafWidth, leafWidth * 0.5f, leafWidth);
-            _rightDoor = CreateGateLeaf("Right Gate", leafWidth, -leafWidth * 0.5f, leafWidth);
-        }
-
-        private Transform CreateGateLeaf(string leafName, float hingeX, float localCenterX, float leafWidth)
-        {
-            var hinge = new GameObject(leafName + " Hinge").transform;
-            hinge.SetParent(transform, false);
-            hinge.localPosition = new Vector3(hingeX, 1.75f, goalZ);
-
-            var leaf = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            Destroy(leaf.GetComponent<Collider>());
-            leaf.name = leafName;
-            leaf.transform.SetParent(hinge, false);
-            leaf.transform.localPosition = new Vector3(localCenterX, 0f, 0f);
-            leaf.transform.localScale = new Vector3(leafWidth, 3.5f, 0.4f);
-            leaf.GetComponent<Renderer>().material.color = new Color(0.6f, 0.2f, 0.2f);
-            return hinge;
+            Gate = GateController.Create(transform, goalZ, startRadius);
         }
 
         public void SetRoad(float halfWidth)
@@ -228,31 +207,5 @@ namespace Gameplay
                 _objs[idx[i]].Explode(dep[i] * 0.12f);
         }
 
-        public void OpenDoor()
-        {
-            if (_doorOpened) return;
-            _doorOpened = true;
-            StartCoroutine(OpenRoutine());
-        }
-
-        private IEnumerator OpenRoutine()
-        {
-            const float openDuration = 0.8f;
-            Quaternion leftClosed = _leftDoor.localRotation;
-            Quaternion rightClosed = _rightDoor.localRotation;
-            Quaternion leftOpen = Quaternion.Euler(0f, -100f, 0f);
-            Quaternion rightOpen = Quaternion.Euler(0f, 100f, 0f);
-
-            for (float elapsed = 0f; elapsed < openDuration; elapsed += Time.deltaTime)
-            {
-                float t = Mathf.SmoothStep(0f, 1f, elapsed / openDuration);
-                _leftDoor.localRotation = Quaternion.Slerp(leftClosed, leftOpen, t);
-                _rightDoor.localRotation = Quaternion.Slerp(rightClosed, rightOpen, t);
-                yield return null;
-            }
-
-            _leftDoor.localRotation = leftOpen;
-            _rightDoor.localRotation = rightOpen;
-        }
     }
 }

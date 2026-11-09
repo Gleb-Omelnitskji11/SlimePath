@@ -78,7 +78,7 @@ namespace Gameplay
         int blocker = LevelRules.FindBlocker(_level.Data, _level.Dead, _z, Radius, out float stopZ);
         float targetZ = blocker >= 0 ? stopZ : _level.GoalZ - 0.5f;
  
-        if (_level.GoalZ - _z <= _level.doorClearZone) _level.OpenDoor();
+        if (_level.GoalZ - _z <= _level.doorClearZone) _progressor.OpenGate();
  
         if (_z < targetZ - 0.01f)
         {

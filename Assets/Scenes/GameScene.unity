@@ -648,8 +648,8 @@ MonoBehaviour:
   spacing: {x: 1.5, y: 3.2}
   roadDensity: 0.8
   clusterChance: 0.4
-  sideMinX: 3.2
-  sideMaxX: 9
+  sideMinX: 2.2
+  sideMaxX: 4
   sideDensity: 0.7
   maxAttempts: 50
   playerWasteFactor: 1.25

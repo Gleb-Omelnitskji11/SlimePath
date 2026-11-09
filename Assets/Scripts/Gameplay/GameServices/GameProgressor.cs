@@ -1,6 +1,7 @@
 using Core.PopupShower;
 using Core.ServiceLocator;
 using Cysharp.Threading.Tasks;
+using UnityEngine.SceneManagement;
 
 namespace Gameplay.GameServices
 {
@@ -24,8 +25,7 @@ namespace Gameplay.GameServices
 
         public void RepeatGame()
         {
-            Clear();
-            StartGame();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
         public void StartGame()
@@ -57,6 +57,11 @@ namespace Gameplay.GameServices
             _popupsProvider.TryOpen(PopupID.ResultPopup, true);
         }
 
+        public void OpenGate()
+        {
+            _levelGenerator.Gate?.Open();
+        }
+
         private void InitPlayer()
         {
             _playerHolder.Player.StartGame();
@@ -65,8 +70,5 @@ namespace Gameplay.GameServices
             _playerHolder.Player.ApplyVisual();
         }
 
-        private void Clear()
-        {
-        }
     }
 }
