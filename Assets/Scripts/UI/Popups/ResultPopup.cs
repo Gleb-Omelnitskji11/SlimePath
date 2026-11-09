@@ -1,5 +1,6 @@
 using Core.ServiceLocator;
 using Gameplay;
+using Gameplay.GameServices;
 using TMPro;
 using UI;
 using UnityEngine;
@@ -17,7 +18,7 @@ namespace Popups
         
         private GameProgressor _gameProgressor;
 
-        private void Start()
+        private void Awake()
         {
             _gameProgressor = Services.Get<GameProgressor>();
             _nextButton.onClick.AddListener(RepeatGame);

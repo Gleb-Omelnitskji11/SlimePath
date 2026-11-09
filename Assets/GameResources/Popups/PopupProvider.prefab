@@ -54,7 +54,7 @@ MonoBehaviour:
   _popups:
   - id: 1
     popup: {fileID: 8371682280806129321, guid: 06910e096ddda6041afed700108bf1ec, type: 3}
-  - id: 1
+  - id: 0
     popup: {fileID: 7572355084784984438, guid: c461d5dbf519af64ea73cc80735b4158, type: 3}
 --- !u!223 &3473411795108331737
 Canvas:
