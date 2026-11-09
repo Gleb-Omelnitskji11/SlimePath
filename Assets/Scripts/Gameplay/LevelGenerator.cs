@@ -35,7 +35,8 @@ namespace Gameplay
         public float GoalZ => goalZ;
 
         private Obstacle[] _objs;
-        private Transform _road, _door;
+        private Transform _road;
+        private Transform _leftDoor, _rightDoor;
         private bool _doorOpened;
 
         public void Build()
@@ -188,15 +189,27 @@ namespace Gameplay
             _road = r.transform;
             SetRoad(startRadius * 2f);
 
-            // Door
-            var d2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            Destroy(d2.GetComponent<Collider>());
-            d2.transform.SetParent(transform);
-            d2.name = "Door";
-            d2.transform.position = new Vector3(0, 1.75f, goalZ);
-            d2.transform.localScale = new Vector3(startRadius * 4f + 1f, 3.5f, 0.4f);
-            d2.GetComponent<Renderer>().material.color = new Color(0.6f, 0.2f, 0.2f);
-            _door = d2.transform;
+            // Double gate with leaves hinged at the outer edges.
+            float gateWidth = startRadius * 4f + 1f;
+            float leafWidth = gateWidth * 0.5f;
+            _leftDoor = CreateGateLeaf("Left Gate", -leafWidth, leafWidth * 0.5f, leafWidth);
+            _rightDoor = CreateGateLeaf("Right Gate", leafWidth, -leafWidth * 0.5f, leafWidth);
+        }
+
+        private Transform CreateGateLeaf(string leafName, float hingeX, float localCenterX, float leafWidth)
+        {
+            var hinge = new GameObject(leafName + " Hinge").transform;
+            hinge.SetParent(transform, false);
+            hinge.localPosition = new Vector3(hingeX, 1.75f, goalZ);
+
+            var leaf = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            Destroy(leaf.GetComponent<Collider>());
+            leaf.name = leafName;
+            leaf.transform.SetParent(hinge, false);
+            leaf.transform.localPosition = new Vector3(localCenterX, 0f, 0f);
+            leaf.transform.localScale = new Vector3(leafWidth, 3.5f, 0.4f);
+            leaf.GetComponent<Renderer>().material.color = new Color(0.6f, 0.2f, 0.2f);
+            return hinge;
         }
 
         public void SetRoad(float halfWidth)
@@ -224,14 +237,22 @@ namespace Gameplay
 
         private IEnumerator OpenRoutine()
         {
-            Vector3 from = _door.position, to = from + Vector3.up * 4f;
-            for (float t = 0; t < 1f; t += Time.deltaTime)
+            const float openDuration = 0.8f;
+            Quaternion leftClosed = _leftDoor.localRotation;
+            Quaternion rightClosed = _rightDoor.localRotation;
+            Quaternion leftOpen = Quaternion.Euler(0f, -100f, 0f);
+            Quaternion rightOpen = Quaternion.Euler(0f, 100f, 0f);
+
+            for (float elapsed = 0f; elapsed < openDuration; elapsed += Time.deltaTime)
             {
-                _door.position = Vector3.Lerp(from, to, t);
+                float t = Mathf.SmoothStep(0f, 1f, elapsed / openDuration);
+                _leftDoor.localRotation = Quaternion.Slerp(leftClosed, leftOpen, t);
+                _rightDoor.localRotation = Quaternion.Slerp(rightClosed, rightOpen, t);
                 yield return null;
             }
 
-            _door.position = to;
+            _leftDoor.localRotation = leftOpen;
+            _rightDoor.localRotation = rightOpen;
         }
     }
 }
