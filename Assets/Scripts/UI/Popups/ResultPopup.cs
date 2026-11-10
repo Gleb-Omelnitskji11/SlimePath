@@ -1,9 +1,11 @@
+using Core;
 using Core.ServiceLocator;
 using Gameplay;
 using Gameplay.GameServices;
 using TMPro;
 using UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Popups
@@ -22,6 +24,7 @@ namespace Popups
         {
             _gameProgressor = Services.Get<GameProgressor>();
             _nextButton.onClick.AddListener(RepeatGame);
+            _menuButton.onClick.AddListener(GoToMenu);
             _exitButton.onClick.AddListener(Quit);
         }
 
@@ -42,6 +45,13 @@ namespace Popups
         {
             Close();
             _gameProgressor.RepeatGame();
+        }
+
+        private void GoToMenu()
+        {
+            Close();
+            string sceneName = Constants.MenuScene;
+            SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
         }
 
         private void Quit()
