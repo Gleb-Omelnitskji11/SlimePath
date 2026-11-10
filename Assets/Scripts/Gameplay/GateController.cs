@@ -14,13 +14,13 @@ namespace Gameplay
         private Transform _rightHinge;
         private bool _isOpen;
 
-        public static GateController Create(Transform parent, float positionZ, float playerStartRadius)
+        public static GateController Create(Transform parent, float positionZ, float playerStartRadius, Material doorMaterial)
         {
             var gateObject = new GameObject("Gate");
             gateObject.transform.SetParent(parent, false);
 
             var gate = gateObject.AddComponent<GateController>();
-            gate.Initialize(positionZ, playerStartRadius);
+            gate.Initialize(positionZ, playerStartRadius, doorMaterial);
             return gate;
         }
 
@@ -32,15 +32,15 @@ namespace Gameplay
             StartCoroutine(OpenRoutine());
         }
 
-        private void Initialize(float positionZ, float playerStartRadius)
+        private void Initialize(float positionZ, float playerStartRadius, Material doorMaterial)
         {
             float gateWidth = playerStartRadius * 4f + 1f;
             float leafWidth = gateWidth * 0.5f;
 
             _leftHinge = CreateHinge("Left Hinge", -leafWidth, positionZ);
             _rightHinge = CreateHinge("Right Hinge", leafWidth, positionZ);
-            CreateLeaf("Left Leaf", _leftHinge, leafWidth * 0.5f, leafWidth);
-            CreateLeaf("Right Leaf", _rightHinge, -leafWidth * 0.5f, leafWidth);
+            CreateLeaf("Left Leaf", _leftHinge, leafWidth * 0.5f, leafWidth, doorMaterial);
+            CreateLeaf("Right Leaf", _rightHinge, -leafWidth * 0.5f, leafWidth, doorMaterial);
         }
 
         private Transform CreateHinge(string hingeName, float x, float positionZ)
@@ -51,7 +51,7 @@ namespace Gameplay
             return hinge;
         }
 
-        private static void CreateLeaf(string leafName, Transform hinge, float centerX, float width)
+        private static void CreateLeaf(string leafName, Transform hinge, float centerX, float width, Material doorMaterial)
         {
             var leaf = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Destroy(leaf.GetComponent<Collider>());
@@ -59,7 +59,7 @@ namespace Gameplay
             leaf.transform.SetParent(hinge, false);
             leaf.transform.localPosition = new Vector3(centerX, 0f, 0f);
             leaf.transform.localScale = new Vector3(width, GateHeight, GateDepth);
-            leaf.GetComponent<Renderer>().material.color = new Color(0.6f, 0.2f, 0.2f);
+            leaf.GetComponent<Renderer>().sharedMaterial  = doorMaterial;
         }
 
         private IEnumerator OpenRoutine()

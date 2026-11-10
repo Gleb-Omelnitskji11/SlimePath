@@ -1057,7 +1057,7 @@ GameObject:
   - component: {fileID: 928324434189164128}
   - component: {fileID: 5064476393363527818}
   m_Layer: 5
-  m_Name: CloseButton (1)
+  m_Name: 'CloseButton '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1166,7 +1166,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8371682280806129321}
         m_TargetAssemblyTypeName: Popups.PausePopup, Project
-        m_MethodName: Close
+        m_MethodName: Resume
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

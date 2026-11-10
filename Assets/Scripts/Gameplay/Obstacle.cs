@@ -7,17 +7,17 @@ namespace Gameplay
     {
         public float radius;
  
-        public void Explode(float delay)
+        public void Explode(float delay, Material explodeMaterial)
         {
-            StartCoroutine(ExplodeRoutine(delay));
+            StartCoroutine(ExplodeRoutine(delay, explodeMaterial));
         }
  
-        IEnumerator ExplodeRoutine(float delay)
+        private IEnumerator ExplodeRoutine(float delay, Material explodeMaterial)
         {
             yield return new WaitForSeconds(delay);
  
             var rend = GetComponent<Renderer>();
-            rend.material.color = Color.red;
+            rend.material = explodeMaterial;
             Vector3 start = transform.localScale;
  
             float t = 0f;

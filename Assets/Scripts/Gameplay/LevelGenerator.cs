@@ -7,32 +7,40 @@ namespace Gameplay
     public class LevelGenerator : MonoBehaviour, IService
     {
         [Header("Level")]
-        public int seed = 12345;
-        public float goalZ = 13f;
-        public float startClearZone = 2f;
-        public float doorClearZone = 1f;
-        public float startRadius = 1f;
+        [SerializeField] private  int seed = 12345;
+        [SerializeField] private  float goalZ = 13f;
+        [SerializeField] private  float startClearZone = 2f;
+        [SerializeField] private  float doorClearZone = 1f;
+        [SerializeField] private  float startRadius = 1f;
 
         [Header("Road Obstacles")]
-        public float roadObstacleMaxX = 1.6f; // Maximum absolute x offset for obstacles on the road.
-        public Vector2 obstacleRadius = new Vector2(0.3f, 0.5f);
-        public Vector2 spacing = new Vector2(1.5f, 3.2f);
-        [Range(0, 1)] public float roadDensity = 0.8f;
-        [Range(0, 1)] public float clusterChance = 0.4f;
+        [SerializeField] private  float roadObstacleMaxX = 1.6f; // Maximum absolute x offset for obstacles on the road.
+        [SerializeField] private  Vector2 obstacleRadius = new Vector2(0.3f, 0.5f);
+        [SerializeField] private  Vector2 spacing = new Vector2(1.5f, 3.2f);
+        [Range(0, 1)] [SerializeField] private  float roadDensity = 0.8f;
+        [Range(0, 1)] [SerializeField] private  float clusterChance = 0.4f;
 
         [Header("Side Obstacles")]
-        public float sideMinX = 2.2f;
-        public float sideMaxX = 4f;
+        [SerializeField] private  float sideMinX = 2.2f;
+        [SerializeField] private  float sideMaxX = 4f;
         [Range(0, 1)] public float sideDensity = 0.7f;
 
         [Header("Validation")]
-        public int maxAttempts = 50;
-        public float playerWasteFactor = 1.2f; // Extra allowance for player input imprecision.
+        [SerializeField] private  int maxAttempts = 50;
+        [SerializeField] private  float playerWasteFactor = 1.2f; // Extra allowance for player input imprecision.
+        
+        [Header("Materials")]
+        [SerializeField] private Material _obstacleMaterial;
+        [SerializeField] private Material _obstacleExplodedMaterial;
+        [SerializeField] private Material _roadMaterial;
+        [SerializeField] private Material _doorMaterial;
 
         public List<ObstacleData> Data { get; private set; }
         public bool[] Dead { get; private set; }
         public float GoalZ => goalZ;
         public GateController Gate { get; private set; }
+        public float StartRadius => startRadius;
+        public float DoorClearZone => doorClearZone;
 
         private Obstacle[] _objs;
         private Transform _road;
@@ -171,8 +179,7 @@ namespace Gameplay
                 go.transform.SetParent(transform);
                 go.transform.position = d.pos;
                 go.transform.localScale = Vector3.one * d.radius * 2f;
-                go.GetComponent<Renderer>().material.color =
-                    d.onRoad ? new Color(0.9f, 0.55f, 0.2f) : new Color(0.55f, 0.55f, 0.65f);
+                go.GetComponent<Renderer>().sharedMaterial  = _obstacleMaterial;
                 var ob = go.AddComponent<Obstacle>();
                 ob.radius = d.radius;
                 _objs[i] = ob;
@@ -183,12 +190,12 @@ namespace Gameplay
             Destroy(r.GetComponent<Collider>());
             r.transform.SetParent(transform);
             r.name = "Road";
-            r.GetComponent<Renderer>().material.color = new Color(0.0f, 0.7f, 0.4f);
+            r.GetComponent<Renderer>().material = _roadMaterial;
             _road = r.transform;
             SetRoad(startRadius * 2f);
 
             // Double gate with leaves hinged at the outer edges.
-            Gate = GateController.Create(transform, goalZ, startRadius);
+            Gate = GateController.Create(transform, goalZ, startRadius, _doorMaterial);
         }
 
         public void SetRoad(float halfWidth)
@@ -204,7 +211,7 @@ namespace Gameplay
             var dep = new List<int>();
             LevelRules.Infect(Data, Dead, hit, shotR, idx, dep);
             for (int i = 0; i < idx.Count; i++)
-                _objs[idx[i]].Explode(dep[i] * 0.12f);
+                _objs[idx[i]].Explode(dep[i] * 0.12f, _obstacleExplodedMaterial);
         }
 
     }

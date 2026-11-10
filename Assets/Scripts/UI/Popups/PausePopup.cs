@@ -43,7 +43,7 @@ namespace Popups
             _anim.onComplete += () => _gameProgressor.Resume();
         }
 
-        private void Resume()
+        public void Resume()
         {
             Close();
         }
